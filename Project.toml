@@ -1,0 +1,6 @@
+authors = ["nsaloua <naamasaloua1998@gmail.com>"]
+name = "ControleOptimal"
+uuid = "b13ffa8e-caa1-11ea-103b-171d11149a30"
+version = "0.1.0"
+
+[deps]
