@@ -2,12 +2,6 @@
 uuid = "2a0f44e3-6c83-55bd-87e4-b1978d98bd5f"
 
 
-[[ControleOptimal]]
-deps = ["Test","Plots","PyPlot"]
-uuid = "b13ffa8e-caa1-11ea-103b-171d11149a30"
-version = "0.1.0"
-
-
 [[Dates]]
 deps = ["Printf"]
 uuid = "ade2ca70-3891-5945-98fb-dc099432e06a"
