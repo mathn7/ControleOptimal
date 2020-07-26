@@ -8,7 +8,7 @@
 #***************************************************************************
 #
 # Intégration de l'equation differentiel du problème 1 avec minimisation de
-# l'énergie.
+# la consommation.
 #
 # ---------------
 
@@ -28,18 +28,30 @@ include("lib/ode_runge.jl")
 # -----------------------------------------------------------------------
 # deuxieme membre de l'edo
 # ------------------------
-function hvfun_pb1_energie(t,z)
-    zpoint = [-z[1]+z[2]  z[2]]'
-    return zpoint
+function hvfun_pb1_conso(t,z)   
+
+    z2point = z[2]
+    z1point = -z[1]
+    if abs(z[2]) >= 1
+        z1point=z1point+sign(z[2])
+    end
+    
+
+    return [z1point z2point]'
 end
 
 #
 # Solution exacte de l'edo
 # ------------------------
-function exphvfun_pb1_energie(t,z0)
-    zf = zeros(1,2)
-    zf[1] = (z0[2]/2)*exp(t)+(z0[1]-z0[2]/2)*exp(-t)
-    zf[2] = z0[2]*exp(t)
+function exphvfun_pb1_conso(t,z0)
+
+    if t>=1
+        u = sign(z0[2])
+    else
+        u=0
+    end
+    zf = [z0[1]*exp(-t) + u*(1-exp(1-t))  z0[2]*exp(t)]
+
     return zf
 end
 
@@ -78,13 +90,13 @@ N = 10
 pyplot()
 plt = Plots.plot(layout=(3))
 
-T, Z = ode_euler(hvfun_pb1_energie, [t0 tf], z0, N)
+T, Z = ode_euler(hvfun_pb1_conso, [t0 tf], z0, N)
 plot_sol(plt, T, Z, "magenta", "euler", true)
 
 #################
 
 
-T, X = ode_runge(hvfun_pb1_energie,[t0 tf],z0,N)
+T, X = ode_runge(hvfun_pb1_conso,[t0 tf],z0,N)
 plot_sol(plt,T, X, "red", "runge", true)
 
 
@@ -92,13 +104,13 @@ plot_sol(plt,T, X, "red", "runge", true)
 ################
 
 
-T, Xheun = ode_heun(hvfun_pb1_energie,[t0 tf],z0,N)
+T, Xheun = ode_heun(hvfun_pb1_conso,[t0 tf],z0,N)
 plot_sol(plt, T, Xheun, "green", "heun", true)
 
 
 ##################
 
-T, Xrk4 = ode_rk4(hvfun_pb1_energie,[t0 tf],z0,N)
+T, Xrk4 = ode_rk4(hvfun_pb1_conso,[t0 tf],z0,N)
 plot_sol(plt, T, Xrk4, "blue", "rk4", true)
 
 
@@ -113,7 +125,7 @@ plt = Plots.plot(layout=(1,2))
 
 #Courbes d'ordre
 N=N0
-zf = exphvfun_pb1_energie(tf,z0)
+zf = exphvfun_pb1_conso(tf,z0)
 
 #erreur [ordre]
 err1=zeros(length(N),2)
@@ -125,7 +137,7 @@ err5 = err4
 #Euler
 nfe= N
 for i = 1:length(N)
-    T, Z = ode_euler(hvfun_pb1_energie, [t0 tf], z0, N[i])
+    T, Z = ode_euler(hvfun_pb1_conso, [t0 tf], z0, N[i])
     err1[i,:] = log10.(abs.( Z[end,:]' - zf))
 end
 
@@ -136,7 +148,7 @@ Plots.plot!(log10.(nfe),err1[:,2],color="magenta" , xlabel="log_{10}(fe)", ylabe
 
 #Runge
 for i = 1:length(N)
-    T, Z=ode_runge(hvfun_pb1_energie, [t0 tf], z0, N[i]/2)
+    T, Z=ode_runge(hvfun_pb1_conso, [t0 tf], z0, N[i]/2)
     err2[i,:] = log10.(abs.( Z[end,:]' - zf))
 end
 
@@ -147,7 +159,7 @@ Plots.plot!(log10.(nfe),err2[:,2],color="red" , xlabel="log_{10}(fe)", ylabel="l
 
 #Heun
 for i = 1:length(N)
-    T,Z=ode_heun(hvfun_pb1_energie, [t0 tf], z0, N[i]/3)
+    T,Z=ode_heun(hvfun_pb1_conso, [t0 tf], z0, N[i]/3)
     err3[i,:] = log10.(abs.( Z[end,:]' - zf))
 end
 
@@ -159,7 +171,7 @@ Plots.plot!(log10.(nfe),err3[:,2],color="green" , xlabel="log_{10}(fe)", ylabel=
 
 # #RK4
 for i = 1:length(N)
-    T, Z=ode_rk4(hvfun_pb1_energie, [t0 tf], z0, N[i]/4)
+    T, Z=ode_rk4(hvfun_pb1_conso, [t0 tf], z0, N[i]/4)
     err4[i,:] = log10.(abs.( Z[end,:]' - zf))
 end
 
