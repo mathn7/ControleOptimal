@@ -9,8 +9,6 @@ julia:
 notifications:
   email: false
   
-install: travis_wait 30 sleep 1800 &  
-
 jobs:
   include:
     - stage: Documentation
