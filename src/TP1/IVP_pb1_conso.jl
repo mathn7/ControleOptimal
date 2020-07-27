@@ -14,6 +14,8 @@
 
 using Plots
 using LinearAlgebra
+using DifferentialEquations
+
 
 
 include("lib/ode_rk4.jl")
@@ -38,6 +40,19 @@ function hvfun_pb1_conso(t,z)
     
 
     return [z1point z2point]'
+end
+#-----------------------------------------------------------------------
+# meme fct mais ecrite differemment pour le solveur 
+#-----------------------------------------------------------------------
+function hvfun_ode_conso!(zpoint, z, p, t)
+    z2point = z[2]
+    z1point = -z[1]
+    if abs(z[2]) >= 1
+        z1point=z1point+sign(z[2])
+    end
+    zpoint[1] = z1point
+    zpoint[2] = z2point
+
 end
 
 #
@@ -90,29 +105,51 @@ N = 10
 pyplot()
 plt = Plots.plot(layout=(3))
 
+#Euler
 T, Z = ode_euler(hvfun_pb1_conso, [t0 tf], z0, N)
-plot_sol(plt, T, Z, "magenta", "euler", true)
+plot_sol(plt, T, Z, "magenta", "euler")
 
 #################
 
-
+#runge
 T, X = ode_runge(hvfun_pb1_conso,[t0 tf],z0,N)
-plot_sol(plt,T, X, "red", "runge", true)
+plot_sol(plt,T, X, "red", "runge")
 
 
 
 ################
 
-
+#heun
 T, Xheun = ode_heun(hvfun_pb1_conso,[t0 tf],z0,N)
-plot_sol(plt, T, Xheun, "green", "heun", true)
+plot_sol(plt, T, Xheun, "green", "heun")
 
 
 ##################
 
+#rk4
 T, Xrk4 = ode_rk4(hvfun_pb1_conso,[t0 tf],z0,N)
-plot_sol(plt, T, Xrk4, "blue", "rk4", true)
+plot_sol(plt, T, Xrk4, "blue", "rk4")
 
+
+#ODEProblem
+
+RelTol = 1e-10
+AbsTol = 1e-10
+
+prob = ODEProblem(hvfun_ode_conso!, z0, (t0 ,tf))
+sol = solve(prob,reltol=RelTol , abstol=AbsTol)
+
+# extraction 
+T = sol.t
+XODE = sol.u
+# Adaptation de la forme de X
+X = XODE[1]'
+for i in 2:length(XODE)
+   global X = [X;XODE[i]']
+end
+
+
+plot_sol(plt, T, X, "cyan", "ODEProblem")
 
 
 ################################################################################
@@ -169,7 +206,7 @@ Plots.plot!(log10.(nfe),err3[:,2],color="green" , xlabel="log_{10}(fe)", ylabel=
 
 
 
-# #RK4
+#RK4
 for i = 1:length(N)
     T, Z=ode_rk4(hvfun_pb1_conso, [t0 tf], z0, N[i]/4)
     err4[i,:] = log10.(abs.( Z[end,:]' - zf))
@@ -180,6 +217,21 @@ end
 Plots.plot!(log10.(nfe),err4[:,1],color="blue" ,xlabel="log_{10}(fe)", ylabel="log_{10}(erreur pour y_1)",subplot=1,label="rk4")
 Plots.plot!(log10.(nfe),err4[:,2],color="blue" , xlabel="log_{10}(fe)", ylabel="log_{10}(erreur pour y_2)",subplot=2,label="rk4")
 
+#ODEProblem
+for i = 1:length(N)
+
+    prob = ODEProblem(hvfun_ode_conso!, z0, (t0 ,tf))
+    sol = solve(prob,reltol=RelTol , abstol=AbsTol)
+
+    # extraction 
+    T = sol.t
+    XODE = sol.u
+    # Adaptation de la forme de X
+    err5[i,:] = log10.(abs.(XODE[end]' - zf))
+end
+
+Plots.plot!(log10.(nfe),err5[:,1],color="cyan" ,xlabel="log_{10}(fe)", ylabel="log_{10}(erreur pour y_1)",subplot=1,label="ODEProblem")
+Plots.plot!(log10.(nfe),err5[:,2],color="cyan" , xlabel="log_{10}(fe)", ylabel="log_{10}(erreur pour y_2)",subplot=2,label="ODEProblem")
 
 
 
