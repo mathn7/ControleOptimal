@@ -1,5 +1,6 @@
+using DifferentialEquations
 
-#function exphvfun(tspan, z0, options, par)
+function exphvfun(tspan, z0, options, par)
     #-------------------------------------------------------------------------------------------
     #
     #    exphvfun()
@@ -29,13 +30,18 @@
     #
     #-------------------------------------------------------------------------------------------
     
-    ## A REMPLACER
-    # tout = range(tspan[1], tspan[2], length = 100)
-    # z    = z0 * ones(1,length(tout))
 
-    using DifferentialEquations
-    tout, z = (hvfun,z0,tspan,options)
-    tout = tout'
-    z = z'
-    return tout, z
+    prob = ODEProblem(hvfun, z0, (t0 ,tf))
+
+    sol = solve(prb, reltol= options[1], abstol = options[2])
+    tout = sol.t
+    x = sol.u 
+    # Adaptation de la forme de X
+    X = x[1]'
+    for i in 2:length(x)
+        global z = [z;x[i]']
     end
+    return tout, z
+
+end
+

@@ -1,5 +1,5 @@
 include("control.jl")
-function hvfun(t, z, par)
+function hvfun!(hv, z, par, t)
     #-------------------------------------------------------------------------------------------
     #
     #    hvfun()
@@ -32,6 +32,5 @@ function hvfun(t, z, par)
     
     hv = [-x+u  p]'
 
-    return hv
-    end
+end
     

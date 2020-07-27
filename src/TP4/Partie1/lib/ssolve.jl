@@ -1,3 +1,5 @@
+using NLsolve
+include("sfun.jl")
 function ssolve(y0,options,par)
     #-------------------------------------------------------------------------------------------
     #
@@ -31,10 +33,9 @@ function ssolve(y0,options,par)
     #-------------------------------------------------------------------------------------------
     
 
-    [ysol, ssol,flag,output] = fsolve(@(y0) sfun(y0,options,par),y0,options)
-    nfev = output.funcCount 
-    niter = output.iterations
+    ysol = nsolve(sfun!,y0)
 
-    return ysol, ssol, nfev, niter, flag
-    end
+
+    return ysol
+end
     

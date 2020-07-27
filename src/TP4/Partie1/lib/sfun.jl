@@ -1,5 +1,5 @@
 include("exphvfun.jl")
-function sfun(y,options,par)
+function sfun!(s, y,options,par)
     #-------------------------------------------------------------------------------------------
     #
     #    sfun()
@@ -36,9 +36,8 @@ function sfun(y,options,par)
     p0 = y
     z0 = [x0 p0]'
     
-    ~, z = exphvfun[[t0 tf], z0, options, par]
+    ~, z = exphvfun([t0 tf], z0, options, par)
     x = z[1,end]
     s = x- xf
-    return s 
-    end
+end
     
