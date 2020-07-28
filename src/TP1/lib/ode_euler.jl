@@ -1,37 +1,24 @@
-#=========================================================================================
-#
-#    Explicit Euler method
-#
-#    Description
-#
-#        Numerical integration of the Cauchy's problem
-#        x_point(t) = f(t,x(t))
-#        x(t_0) = x_0
-#
-#-------------------------------------------------------------------------------------------
-#
-#    Usage
-#
-#        T, X = ode_euler(f,t0tf,y0,N)
-#
-#    Inputs
-#        f    - function     : second member of the ode whith the interface
-#                              xpoint = f(t, x)
-#                                  t    - real     : time,
-#                                  x = vector of R^n with the same dimension of x0
-#        t0tf - real(2)      : intial and final time  [t0,tf]
-#        x0   - real(n)      : initial point
-#        N    - integer      : number of steps (>1)
-#
-#    Outputs
-#        T    - real(N+1,1)  : vector of times
-#        X    - real(N+1,n)  : Matrix of solution
-#        The line i of [T Y] contains ti and x_i
-#
-=###############################################################################################
+@doc doc"""
+
+# Syntaxe
+```julia
+T, X = ode_euler(f,t0tf,y0,N)```
+# Entrée :
+   * **f**    : Function -second member of the ode whith the interface -xpoint = f(t, x) t    - real     : time, x = vector of R^n with the same dimension of x0
+   * **t0tf** : intial and final time  [t0,tf]
+   * **y0**   : Array{Float64,1}      : initial point
+   * **N**    : Int number of steps (>1)
+
+# Sortie:
+   * **T**    : Array{Float64,1} real(N+1,1)  : vector of times
+   * **X**    : Array{Float64,2}    Matrix of solution
+
+"""
+
 
 function  ode_euler(f::Function,t0tf,x0,N)
 
+    N = Int(N)
     n = length(x0)
     T = zeros(N+1,1)
     X = zeros(N+1,n)
@@ -47,3 +34,4 @@ function  ode_euler(f::Function,t0tf,x0,N)
 
     return T, X
 end
+
